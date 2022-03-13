@@ -33,6 +33,23 @@ export class UserService {
     }
   }
 
+  async getUsers(): Promise<Chat.ReturnType<Auth.Users[]>> {
+    const getUsers = await this.userRepository.find();
+    if (!getUsers) throw new NotFoundException('Users not found');
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Successful',
+      data: getUsers.map(user => {
+        return {
+          id: user.userid,
+          username: user.username,
+          avatar: user.avatar,
+        }
+      }),
+    };
+  }
+
   async updateState(
     user: Auth.User,
     field: PatchStateDto,

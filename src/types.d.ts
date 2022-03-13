@@ -19,6 +19,12 @@ declare global {
       state: string;
       avatar: string;
     }
+
+    interface Users {
+      id: string;
+      username: string;
+      avatar: string;
+    }
   }
 
   namespace Email {

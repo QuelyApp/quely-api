@@ -18,18 +18,22 @@ import { PatchStateDto } from './dto/patch-state.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
+@Authorize(RoleTypes.User)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get('/all')
+  getUsers(): Promise<Chat.ReturnType<Auth.Users[]>> {
+    return this.userService.getUsers();
+  }
+
   @Get('/@me')
-  @Authorize(RoleTypes.User)
   getUser(@User() user: Auth.User): Promise<Chat.ReturnType<Auth.User>> {
     return this.userService.getUserInfo(user);
   }
 
   @UseInterceptors(FileInterceptor('file'))
   @Post('/avatar')
-  @Authorize(RoleTypes.User)
   uploadFile(
     @User() user: Auth.User,
     @UploadedFile() file,
@@ -45,7 +49,6 @@ export class UserController {
   }
 
   @Patch('/update-state')
-  @Authorize(RoleTypes.User)
   updateState(
     @User() user: Auth.User,
     @Body() field: PatchStateDto,
