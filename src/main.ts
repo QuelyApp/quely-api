@@ -4,8 +4,12 @@ import { CONFIG } from './config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  //app.setGlobalPrefix(CONFIG.API_VERSION);
+  const app = await NestFactory.create(AppModule, {
+    cors: {
+      origin: '*',
+    },
+  });
+  app.setGlobalPrefix(CONFIG.API_VERSION);
 
   const config = new DocumentBuilder()
     .setTitle('Chat App')

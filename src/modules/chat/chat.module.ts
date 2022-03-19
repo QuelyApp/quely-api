@@ -1,14 +1,22 @@
 import { Module } from '@nestjs/common';
-import { ChatService } from './chat.service';
 import { ChatGateway } from './chat.gateway';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Room } from './entities/room.entity';
-import { ConnectedUser } from './entities/connected-user.entity';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { User } from '@modules/auth/entities/user.entity';
+import { Friend } from '@modules/friend/entities/friend.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Room, ConnectedUser]),
+    TypeOrmModule.forFeature([User, Friend]),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+      }),
+      inject: [ConfigService],
+    }),
   ],
-  providers: [ChatService, ChatGateway],
+  providers: [ChatGateway],
 })
 export class ChatModule {}

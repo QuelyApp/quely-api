@@ -40,12 +40,12 @@ export class UserService {
     return {
       statusCode: HttpStatus.OK,
       message: 'Successful',
-      data: getUsers.map(user => {
+      data: getUsers.map((user) => {
         return {
           id: user.userid,
           username: user.username,
           avatar: user.avatar,
-        }
+        };
       }),
     };
   }
@@ -133,6 +133,7 @@ export class UserService {
       statusCode: HttpStatus.OK,
       message: 'Successful',
       data: {
+        id: getUser.userid,
         username: getUser.username,
         email: getUser.email,
         role: getUser.role,
