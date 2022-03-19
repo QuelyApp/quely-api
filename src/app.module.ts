@@ -1,5 +1,8 @@
 import { Email } from '@modules/auth/entities/email.entity';
 import { User } from '@modules/auth/entities/user.entity';
+import { ChatModule } from '@modules/chat/chat.module';
+import { ConnectedUser } from '@modules/chat/entities/connected-user.entity';
+import { Room } from '@modules/chat/entities/room.entity';
 import { Friend } from '@modules/friend/entities/friend.entity';
 import { UserModule } from '@modules/user/user.module';
 import { Module } from '@nestjs/common';
@@ -30,7 +33,7 @@ import { FriendModule } from './modules/friend/friend.module';
         username: configService.get<string>('POSTGRES.USERNAME'),
         password: configService.get<string>('POSTGRES.PASSWORD'),
         database: configService.get<string>('POSTGRES.DATABASE'),
-        entities: [User, Email, Friend],
+        entities: [User, Email, Friend, Room, ConnectedUser],
         synchronize: true,
       }),
       inject: [ConfigService],
@@ -38,6 +41,7 @@ import { FriendModule } from './modules/friend/friend.module';
     AuthModule,
     UserModule,
     FriendModule,
+    ChatModule
   ],
   controllers: [AppController],
   providers: [AppService],
