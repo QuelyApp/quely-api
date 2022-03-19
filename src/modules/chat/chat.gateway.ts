@@ -16,6 +16,7 @@ export class ChatGateway {
   @WebSocketServer()
   server: Server;
   token: any;
+  messages: any[] = [];
 
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
@@ -37,6 +38,50 @@ export class ChatGateway {
     if (!tokenisValid) throw new BadGatewayException();
 
     this.token = tokenisValid;
+    return true;
+  }
+
+  @SubscribeMessage('getRoomMessages')
+  async getRoomMessages(socket, id: string): Promise<Boolean> {
+    if (!this.token) throw new BadGatewayException();
+
+    const userFromDb = await this.userRepository.findOne({ userid: id });
+    if (!userFromDb) throw new BadGatewayException();
+
+    const getUserById = await this.getUserById();
+    if (!getUserById) throw new BadGatewayException();
+
+    const r = [...socket.rooms].filter((a) =>
+      a.includes(`chat:${getUserById}-${id}`),
+    );
+    if (!r) throw new BadGatewayException();
+
+    this.server.emit('messages', this.messages);
+
+    return true;
+  }
+
+  @SubscribeMessage('createMessage')
+  async createMessage(socket, data): Promise<Boolean> {
+    if (!this.token) throw new BadGatewayException();
+
+    const userFromDb = await this.userRepository.findOne({ userid: data[0] });
+    if (!userFromDb) throw new BadGatewayException();
+
+    const getUserById = await this.getUserById();
+    if (!getUserById) throw new BadGatewayException();
+
+    const r = [...socket.rooms].filter((a) =>
+      a.includes(`chat:${getUserById}-${data[0]}`),
+    );
+    if (!r) throw new BadGatewayException();
+
+    this.messages.push({
+      authorId: getUserById,
+      message: data[1],
+    });
+    this.server.emit('messages', this.messages);
+
     return true;
   }
 

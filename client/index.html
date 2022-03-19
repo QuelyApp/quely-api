@@ -1,44 +1,13 @@
 <html>
 
 <head>
-    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"
-        integrity="sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs"
-        crossorigin="anonymous"></script>
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
     <script src="https://unpkg.com/vue@3"></script>
-
-    <script>
-        const socket = io('http://localhost:3000');
-        socket.on('connect', function () {
-            console.log('Connected', socket.id);
-
-        });
-        socket.on('exception', function (data) {
-            console.log('event', data);
-        });
-        socket.on('disconnect', function () {
-            console.log('Disconnected');
-        });
-
-        socket.on('rooms', function (data) {
-            console.log('rooms', data);
-        });
-        setInterval(() => {
-            
-        }, 2000);
-    </script>
 </head>
 
 <body>
     <div id="app">
-        <h1>Hello World</h1>
-
-        <div @click="sendMessage()" class="kutu">
-            <h1>sa</h1>
-        </div>
-
-        <div @click="sendMessage()" class="kutu">
-            <h1>sa</h1>
-        </div>
+        <h1>sa</h1>
     </div>
 </body>
 <style>
@@ -49,5 +18,37 @@
         color: white;
     }
 </style>
+<script>
+    const socket = io('http://localhost:3000');
+     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjI3ODIwMTUyOTUxOTk2NDE2MCIsImlhdCI6MTY0NzY5Njg5NywiZXhwIjozMzE4MzY5Njg5N30.swhab7tYsGn8f0_Tv6W7MpjXYs1yzXLkZ7ciSsAvzQ0"
+    const token2 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjI3ODIxMjY1MzA1MzI0NzQ4OCIsImlhdCI6MTY0NzY5OTUxOSwiZXhwIjozMzE4MzY5OTUxOX0.B7Rsl0SlU7Q242_ytg5wKRqGK12uactMs5-PoeoWGM0"
+
+    let rooms = [];
+    let uid = "278212653053247488";
+    let a = "278201529519964160";
+
+    socket.on('connect', function () {
+        console.log('Connected', socket.id);
+        socket.emit('auth', token2, (res) => {
+            if (!res) return;
+
+            socket.emit("createRoom", a);
+
+            socket.on("getRooms", function (data) {
+                const users = data.filter(a => a.includes(`chat:${uid}`));
+                console.log("users",users)
+                rooms = users;
+            });
+
+            socket.emit("getRoomMessages", a)
+
+            socket.on("messages", (data) => {
+              console.log("messages", data);
+            });
+            
+            socket.emit("createMessage", a, "forcex <3")
+        });
+    });
+</script>
 
 </html>
