@@ -56,7 +56,7 @@ export class ChatGateway {
     );
     if (!r) throw new BadGatewayException();
 
-    this.server.emit('messages', this.messages);
+    this.server.emit('messages', this.messages.filter(r => r.roomId === `chat:${getUserById}-${id}`));
 
     return true;
   }
@@ -71,16 +71,17 @@ export class ChatGateway {
     const getUserById = await this.getUserById();
     if (!getUserById) throw new BadGatewayException();
 
-    const r = [...socket.rooms].filter((a) =>
+    let r = [...socket.rooms].filter((a) =>
       a.includes(`chat:${getUserById}-${data[0]}`),
     );
     if (!r) throw new BadGatewayException();
 
     this.messages.push({
+      roomId: r[0],
       authorId: getUserById,
       message: data[1],
     });
-    this.server.emit('messages', this.messages);
+    this.server.emit('messages', this.messages.filter(r => r.roomId === `chat:${getUserById}-${data[0]}`));
 
     return true;
   }
@@ -102,8 +103,9 @@ export class ChatGateway {
     });
     if (!getFriendById) throw new BadGatewayException();
 
+    let rooms = [...socket.rooms];
     this.server.socketsJoin(`chat:${getUserById}-${id}`);
-    this.server.emit('getRooms', [...socket.rooms]);
+    this.server.emit('getRooms', rooms.filter(r => r.roomId === `chat:${getUserById}-${id}`));
 
     return true;
   }
@@ -123,8 +125,9 @@ export class ChatGateway {
     );
     if (!r) throw new BadGatewayException();
 
+    let rooms = [...socket.rooms];
     this.server.socketsLeave(`chat:${getUserById}-${id}`);
-    this.server.emit('getRooms', [...socket.rooms]);
+    this.server.emit('getRooms', rooms.filter(r => r.roomId === `chat:${getUserById}-${id}`));
 
     return true;
   }
